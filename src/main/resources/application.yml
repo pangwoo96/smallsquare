@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: small-square
+
+  config:
+    import:
+      - optional:file:.env
+
+  # MySQL ??
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/smallsquare
+    username: ${LOCAL_MYSQL_USERNAME}
+    password: ${LOCAL_MYSQL_PASSWORD}
+
+  # JPA ??
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+# API ?? ??
+server:
+  servlet:
+    context-path: /api
