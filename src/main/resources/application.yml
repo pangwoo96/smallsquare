@@ -6,21 +6,21 @@ spring:
     import:
       - optional:file:.env
 
-  # MySQL ??
+  # MySQL 설정
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/smallsquare
+    url: jdbc:mysql://localhost:3306/small_square
     username: ${LOCAL_MYSQL_USERNAME}
     password: ${LOCAL_MYSQL_PASSWORD}
 
-  # JPA ??
+  # JPA 설정
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: none
     show-sql: true
 
-# API ?? ??
+# API 경로 설정
 server:
   servlet:
     context-path: /api
