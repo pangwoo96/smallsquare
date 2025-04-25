@@ -1,6 +1,8 @@
-package com.smallsquare.report.domain;
+package com.smallsquare.reaction.domain.entity;
 
 import com.smallsquare.common.enums.TargetType;
+import com.smallsquare.common.util.BaseTimeEntity;
+import com.smallsquare.reaction.domain.enums.ReactionType;
 import com.smallsquare.user.domain.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,21 +11,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity @Getter @Builder
-@NoArgsConstructor @AllArgsConstructor
-public class Report {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Reaction extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String reason;
-
     private Long targetId;
 
     @Enumerated(EnumType.STRING)
-    private TargetType targetType; // POST, COMMENT
+    private TargetType targetType;
+
+    @Enumerated(EnumType.STRING)
+    private ReactionType reactionType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
 }
