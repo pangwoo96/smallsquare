@@ -1,6 +1,8 @@
 package com.smallsquare.modules.user.web.dto.request;
 
 import com.smallsquare.modules.user.domain.enums.Role;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -29,6 +31,7 @@ public class UserSignupReqDto {
     @NotBlank(message = "이름은 필수입니다.")
     private String name;
 
+    @Builder.Default
     private Role role = Role.USER;
 
 }
