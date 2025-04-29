@@ -1,6 +1,5 @@
 package com.smallsquare.modules.user.infrastructure.jwt;
 
-import com.smallsquare.modules.user.domain.enums.Role;
 import com.smallsquare.modules.user.web.dto.request.JwtTokenReqDto;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;

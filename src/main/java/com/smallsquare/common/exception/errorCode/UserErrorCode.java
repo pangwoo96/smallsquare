@@ -14,7 +14,9 @@ public enum UserErrorCode {
     DUPLICATED_NICKNAME("이미 존재하는 닉네임입니다.", HttpStatus.CONFLICT),
     PASSWORD_NOT_MATCHED("비밀번호가 일치하지 않습니다.", HttpStatus.CONFLICT),
     USER_NOT_FOUND("회원을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    PASSWORD_MISMATCH("비밀번호와 비밀번호 확인이 일치하지 않습니다.", HttpStatus.CONFLICT);
+    PASSWORD_MISMATCH("비밀번호와 비밀번호 확인이 일치하지 않습니다.", HttpStatus.CONFLICT),
+    ACCESS_TOKEN_EXPIRED("이미 만료된 Access Token입니다.", HttpStatus.CONFLICT),
+    REFRESH_TOKEN_EXPIRED("이미 만료된 Refresh Token입니다.", HttpStatus.CONFLICT);
 
     private final String message;
     private final HttpStatus status;
