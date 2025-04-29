@@ -25,6 +25,7 @@ public class UserService {
     private final JwtProvider jwtProvider;
 
     /**
+     * 회원가입
      * @param: UserSignupReqDto
      * @Returns: 201 Created
      */
@@ -33,16 +34,26 @@ public class UserService {
         // 1. username, nickname, email 중복검사
         validateDuplicate(reqDto);
 
-        // 2. DTO의 필드와 비밀번호를 인코딩해서 User 객체로 변환 후 저장
+        // 2. 비밀번호와 비밀번호 확인이 일치하는지 확인
+        validatePasswordMatch(reqDto);
+
+        // 3. DTO의 필드와 비밀번호를 인코딩해서 User 객체로 변환 후 저장
         User user = User.of(reqDto, passwordEncoder.encode(reqDto.getPassword()));
         userRepository.save(user);
     }
 
+    private void validatePasswordMatch(UserSignupReqDto reqDto) {
+        if (!reqDto.getPassword().equals(reqDto.getCheckPassword())) {
+            throw new UserException(PASSWORD_MISMATCH);
+        }
+    }
+
     /**
-     *
+     * 로그인
      * @param reqDto
      * @return resDto
      */
+    @Transactional
     public UserLoginResDto login(UserLoginReqDto reqDto) {
 
         // 1. 유저조회

@@ -16,6 +16,9 @@ public class UserSignupReqDto {
     @NotBlank(message = "비밀번호는 필수입니다.")
     private String password;
 
+    @NotBlank(message = "비밀번호 확인은 필수입니다.")
+    private String checkPassword;
+
     @NotBlank(message = "닉네임은 필수입니다.")
     private String nickname;
 
