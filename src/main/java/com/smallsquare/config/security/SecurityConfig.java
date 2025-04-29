@@ -123,7 +123,11 @@ public class SecurityConfig {
     // 인증 없이 접근 가능한 URL 패턴
     private RequestMatcher[] permitAllRequestMatchers() {
         List<RequestMatcher> requestMatchers = List.of(
-                antMatcher(POST, "/api/users/")
+                antMatcher(POST, "/api/users/"),
+                antMatcher("/swagger-ui/**"),
+                antMatcher("/swagger-ui.html"),
+                antMatcher("/v3/api-docs/**"),
+                antMatcher("/api-docs/**")
         );
         return requestMatchers.toArray(RequestMatcher[]::new);
     }
