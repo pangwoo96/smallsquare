@@ -4,15 +4,13 @@ import com.smallsquare.modules.user.application.service.UserService;
 import com.smallsquare.modules.user.web.dto.request.UserLogoutReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserLoginReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
+import com.smallsquare.modules.user.web.dto.response.UserInfoResDto;
 import com.smallsquare.modules.user.web.dto.response.UserLoginResDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -53,5 +51,15 @@ public class UserController {
     public ResponseEntity<Void> logout(@RequestBody UserLogoutReqDto reqDto) {
         userService.logout(reqDto);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 내 정보 조회
+     * @return 200 Success / UserInfoResDto (username, name, email, nickname)
+     */
+    @GetMapping("/me")
+    public ResponseEntity<UserInfoResDto> me() {
+        UserInfoResDto resDto = userService.me();
+        return ResponseEntity.status(HttpStatus.OK).body(resDto);
     }
 }

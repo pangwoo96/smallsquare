@@ -3,7 +3,7 @@ package com.smallsquare.modules.user.integration;
 import com.smallsquare.common.exception.exception.UserException;
 import com.smallsquare.modules.user.application.service.UserService;
 import com.smallsquare.modules.user.domain.entity.User;
-import com.smallsquare.modules.user.infrastructure.repository.UserRepository;
+import com.smallsquare.modules.user.infrastructure.repository.JpaUserRepository;
 import com.smallsquare.modules.user.web.dto.request.UserLoginReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
 import com.smallsquare.modules.user.web.dto.response.UserLoginResDto;
@@ -32,7 +32,7 @@ public class UserServiceIntegrationTest {
     private UserService userService;
 
     @Autowired
-    private UserRepository userRepository;
+    private JpaUserRepository jpaUserRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -55,7 +55,7 @@ public class UserServiceIntegrationTest {
 
         // when
         userService.signup(reqDto);
-        Optional<User> savedUser = userRepository.findByUsername("username1");
+        Optional<User> savedUser = jpaUserRepository.findByUsername("username1");
 
         // then
         assertEquals(reqDto.getUsername(), savedUser.get().getUsername());

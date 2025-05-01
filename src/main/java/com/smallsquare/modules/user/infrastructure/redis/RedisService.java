@@ -1,8 +1,6 @@
-package com.smallsquare.modules.user.application.service;
+package com.smallsquare.modules.user.infrastructure.redis;
 
-import com.smallsquare.common.exception.errorCode.UserErrorCode;
 import com.smallsquare.common.exception.exception.UserException;
-import com.smallsquare.modules.user.web.dto.request.UserLogoutReqDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;

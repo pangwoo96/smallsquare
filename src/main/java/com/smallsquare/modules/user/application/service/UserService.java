@@ -2,13 +2,16 @@ package com.smallsquare.modules.user.application.service;
 
 import com.smallsquare.common.exception.exception.UserException;
 import com.smallsquare.modules.user.domain.entity.User;
+import com.smallsquare.modules.user.domain.repository.UserRepository;
 import com.smallsquare.modules.user.infrastructure.jwt.JwtProvider;
 import com.smallsquare.modules.user.infrastructure.jwt.JwtUtil;
-import com.smallsquare.modules.user.infrastructure.repository.UserRepository;
+import com.smallsquare.modules.user.infrastructure.redis.RedisService;
+import com.smallsquare.modules.user.infrastructure.repository.JpaUserRepository;
 import com.smallsquare.modules.user.web.dto.request.UserLogoutReqDto;
 import com.smallsquare.modules.user.web.dto.request.JwtTokenReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserLoginReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
+import com.smallsquare.modules.user.web.dto.response.UserInfoResDto;
 import com.smallsquare.modules.user.web.dto.response.UserLoginResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -99,9 +102,14 @@ public class UserService {
         redisService.saveBlacklist(accessToken, remainTimeAccessToken, refreshToken, remainTimeRefreshToken);
     }
 
+    /**
+     *
+     * @return
+     */
+    public UserInfoResDto me() {
+        return null;
 
-
-
+    }
 
 
     /**
