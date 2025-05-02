@@ -2,6 +2,7 @@ package com.smallsquare.modules.user.application.service;
 
 import com.smallsquare.common.exception.exception.UserException;
 import com.smallsquare.modules.user.domain.entity.User;
+import com.smallsquare.modules.user.domain.repository.UserQueryRepository;
 import com.smallsquare.modules.user.domain.repository.UserRepository;
 import com.smallsquare.modules.user.infrastructure.jwt.JwtProvider;
 import com.smallsquare.modules.user.infrastructure.jwt.JwtUtil;
@@ -18,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static com.smallsquare.common.exception.errorCode.UserErrorCode.*;
 
 @Service
@@ -30,6 +33,7 @@ public class UserService {
     private final JwtProvider jwtProvider;
     private final RedisService redisService;
     private final JwtUtil jwtUtil;
+    private final UserQueryRepository userQueryRepository;
 
     /**
      * 회원가입
@@ -47,12 +51,6 @@ public class UserService {
         // 3. DTO의 필드와 비밀번호를 인코딩해서 User 객체로 변환 후 저장
         User user = User.of(reqDto, passwordEncoder.encode(reqDto.getPassword()));
         userRepository.save(user);
-    }
-
-    private void validatePasswordMatch(UserSignupReqDto reqDto) {
-        if (!reqDto.getPassword().equals(reqDto.getCheckPassword())) {
-            throw new UserException(PASSWORD_MISMATCH);
-        }
     }
 
     /**
@@ -79,7 +77,6 @@ public class UserService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-
     }
 
     /**
@@ -103,17 +100,19 @@ public class UserService {
     }
 
     /**
-     *
-     * @return
+     * 내 정보 조회
+     * QueryDSL을 통해 사용자 정보를 조회
+     * @param userId
+     * @return UserInfoResDto (username, name, email, nickname)
      */
-    public UserInfoResDto me() {
-        return null;
-
+    public UserInfoResDto me(Long userId) {
+         return userQueryRepository.findUserInfoByUserId(userId)
+                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     }
 
 
     /**
-     *  username, nickname, email 중복검사
+     * username, nickname, email 중복검사
      * @param reqDto
      */
     private void validateDuplicate(UserSignupReqDto reqDto) {
@@ -147,11 +146,22 @@ public class UserService {
      */
     private JwtTokenReqDto createTokenDto(User user) {
         return JwtTokenReqDto.builder()
+                .userId(user.getId())
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .email(user.getEmail())
                 .name(user.getName())
                 .role(user.getRole())
                 .build();
+    }
+
+    /**
+     * 비밀번호 & 비밀번호 확인이 서로 일치하는지 확인하는 로직
+     * @param reqDto
+     */
+    private void validatePasswordMatch(UserSignupReqDto reqDto) {
+        if (!reqDto.getPassword().equals(reqDto.getCheckPassword())) {
+            throw new UserException(PASSWORD_MISMATCH);
+        }
     }
 }

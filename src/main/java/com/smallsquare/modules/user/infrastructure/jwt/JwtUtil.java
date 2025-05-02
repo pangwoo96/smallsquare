@@ -4,9 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -34,9 +32,13 @@ public class JwtUtil {
         return jwtParser.parseSignedClaims(token).getBody();
     }
 
+    public Long getUserId(String token) {
+        return Long.parseLong(jwtParser.parseSignedClaims(token).getPayload().getSubject());
+    }
+
     // Username 추출
     public String getUsername(String token) {
-        return parseAllClaims(token).getSubject();
+        return parseAllClaims(token).get("username", String.class);
     }
 
     // Nickname 추출
@@ -59,6 +61,10 @@ public class JwtUtil {
         return parseAllClaims(token).get("type", String.class);
     }
 
+    public String getRole(String token) {
+        return parseAllClaims(token).get("role", String.class);
+    }
+
     // 토큰 발급시간(IssuedAt) 추출
     public Date getIssuedAt(String token) {
         return parseAllClaims(token).getIssuedAt();
@@ -78,5 +84,14 @@ public class JwtUtil {
     // 토큰 만료 여부 확인
     public boolean isExpired(String token) {
         return getExpiration(token).before(new Date());
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            jwtParser.parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

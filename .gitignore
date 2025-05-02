@@ -41,3 +41,6 @@ out/
 
 ### db ###
 db/
+
+### QueryDSL generated sources ###
+/src/main/generated

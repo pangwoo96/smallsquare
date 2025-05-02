@@ -1,5 +1,7 @@
 package com.smallsquare.config.security;
 
+import com.smallsquare.modules.user.infrastructure.jwt.JwtUtil;
+import com.smallsquare.modules.user.infrastructure.security.filter.JwtFilter;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -29,13 +32,15 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final JwtUtil jwtUtil;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // 기본 보안 설정 비활성화
         configureBasicSecurity(http);
 
         // JWT 필터 설정
-        // configureJwtFilter(http);
+        configureJwtFilter(http);
 
         // 예외 처리 설정
         configureExceptionHandling(http);
@@ -94,10 +99,11 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable());
     }
 
-//    // JWT 필터 설정 추가
-//    private void configureJwtFilter(HttpSecurity http) {
-//        http.addFilterAfter(new JWTFilter(jwtUtil), OAuth2LoginAuthenticationFilter.class);
-//    }
+    // JWT 필터 설정 추가
+    private void configureJwtFilter(HttpSecurity http) throws Exception {
+        http.addFilterBefore(new JwtFilter(jwtUtil),
+                UsernamePasswordAuthenticationFilter.class);
+    }
 
     // 인증/인가 예외 처리
     private void configureExceptionHandling(HttpSecurity http) throws Exception {
@@ -145,20 +151,8 @@ public class SecurityConfig {
     // 세션 관리 설정 (JWT 사용 → STATELESS)
     private void configureSession(HttpSecurity http) throws Exception {
         http.sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .maximumSessions(1)
-                        .expiredUrl("/login"));
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     }
-
-//    // 로그아웃 설정
-//    private void configureLogout(HttpSecurity http) throws Exception {
-//        http.logout(logout -> logout
-//                .logoutUrl("/logout")
-//                .addLogoutHandler(customLogoutHandler)
-//                .logoutSuccessHandler((request, response, authentication) ->
-//                        response.setStatus(HttpServletResponse.SC_OK))
-//        );
-//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
