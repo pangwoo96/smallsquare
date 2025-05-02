@@ -6,6 +6,7 @@ import com.smallsquare.modules.user.domain.entity.User;
 import com.smallsquare.modules.user.infrastructure.repository.JpaUserRepository;
 import com.smallsquare.modules.user.web.dto.request.UserLoginReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
+import com.smallsquare.modules.user.web.dto.request.UserUpdateReqDto;
 import com.smallsquare.modules.user.web.dto.response.UserLoginResDto;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +36,21 @@ public class UserServiceIntegrationTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+
+    // 공통 유틸 함수로 분리
+    private Long createAndGetUserId(String username) {
+        UserSignupReqDto reqDto = UserSignupReqDto.builder()
+                .username(username)
+                .password("password1")
+                .checkPassword("password1")
+                .nickname("nickname1")
+                .email("email1@test.com")
+                .name("name1")
+                .build();
+
+        userService.signup(reqDto);
+        return jpaUserRepository.findByUsername(username).get().getId();
+    }
 
     @Test
     @Order(1)
@@ -175,7 +188,6 @@ public class UserServiceIntegrationTest {
     @Order(5)
     void 로그인_성공() {
 
-        // given
         UserSignupReqDto reqDto = UserSignupReqDto.builder()
                 .username("username1")
                 .password("password1")
@@ -192,7 +204,6 @@ public class UserServiceIntegrationTest {
                 .password("password1")
                 .build();
 
-        // when
         UserLoginResDto resDto = userService.login(loginReqDto);
 
         // then
@@ -237,6 +248,44 @@ public class UserServiceIntegrationTest {
 
         // when & then
         assertThrows(UserException.class, () -> userService.login(loginReqDto));
+    }
+
+    @Test
+    @Order(8)
+    void 내_정보_조회_성공() {
+
+        Long userId = createAndGetUserId("testuser");
+
+        UserUpdateReqDto updateReqDto = UserUpdateReqDto.builder()
+                .username("newUsername")
+                .name("newName")
+                .email("newEmail@test.com")
+                .nickname("newNickname")
+                .build();
+
+        // then
+        userService.updateUserInfo(userId, updateReqDto);
+        User updatedUser = jpaUserRepository.findById(userId).orElseThrow();
+
+        assertEquals("newUsername", updatedUser.getUsername());
+        assertEquals("newName", updatedUser.getName());
+        assertEquals("newEmail@test.com", updatedUser.getEmail());
+        assertEquals("newNickname", updatedUser.getNickname());
+
+    }
+
+    @Test
+    void 내정보조회_실패_없는_유저() {
+        Long nonExistentUserId = 9999L;
+
+        UserUpdateReqDto updateDto = UserUpdateReqDto.builder()
+                .username("newUsername")
+                .name("newName")
+                .email("newEmail@test.com")
+                .nickname("newNick")
+                .build();
+
+        assertThrows(UserException.class, () -> userService.updateUserInfo(nonExistentUserId, updateDto));
     }
 
 }
