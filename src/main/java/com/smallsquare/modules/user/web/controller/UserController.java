@@ -1,6 +1,7 @@
 package com.smallsquare.modules.user.web.controller;
 
 import com.smallsquare.modules.user.application.service.UserService;
+import com.smallsquare.modules.user.infrastructure.security.model.CustomUserDetails;
 import com.smallsquare.modules.user.web.dto.request.UserLogoutReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserLoginReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -58,8 +60,8 @@ public class UserController {
      * @return 200 Success / UserInfoResDto (username, name, email, nickname)
      */
     @GetMapping("/me")
-    public ResponseEntity<UserInfoResDto> me() {
-        UserInfoResDto resDto = userService.me();
+    public ResponseEntity<UserInfoResDto> me(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        UserInfoResDto resDto = userService.me(userDetails.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(resDto);
     }
 }

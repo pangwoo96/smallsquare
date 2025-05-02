@@ -8,6 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 public class JwtTokenReqDto {
 
+    private Long userId;
+
     private String username;
 
     private String password;

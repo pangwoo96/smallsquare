@@ -18,9 +18,11 @@ public class JwtProvider {
     private final SecretKey secretKey;
     private final JwtParser jwtParser;
 
+    private static final String USERNAME = "username";
     private static final String NICKNAME_CLAIM = "nickname";
     private static final String EMAIL_CLAIM = "email";
     private static final String NAME_CLAIM = "name";
+    private static final String ROLE = "role";
     private static final String TYPE = "type";
 
     @Value("${JWT_ACCESS_EXPIRATION}")
@@ -41,10 +43,12 @@ public class JwtProvider {
     public String createToken(JwtTokenReqDto reqDto, Long expiredMs, String type) {
         Date now = new Date();
         return Jwts.builder()
-                .subject(reqDto.getUsername())
+                .subject(String.valueOf(reqDto.getUserId()))
+                .claim(USERNAME, reqDto.getUsername())
                 .claim(NICKNAME_CLAIM, reqDto.getNickname())
                 .claim(EMAIL_CLAIM, reqDto.getEmail())
                 .claim(NAME_CLAIM, reqDto.getName())
+                .claim(ROLE, reqDto.getRole())
                 .claim(TYPE, type)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expiredMs))
