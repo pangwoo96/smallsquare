@@ -3,6 +3,7 @@ package com.smallsquare.modules.user.domain.entity;
 import com.smallsquare.common.util.BaseTimeEntity;
 import com.smallsquare.modules.user.domain.enums.Role;
 import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
+import com.smallsquare.modules.user.web.dto.request.UserUpdateReqDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,6 +42,13 @@ public class User extends BaseTimeEntity {
                 .name(reqDto.getName())
                 .role(reqDto.getRole())
                 .build();
+    }
+
+    public void updateInfo(UserUpdateReqDto reqDto) {
+        username = reqDto.getUsername();
+        name = reqDto.getName();
+        email = reqDto.getEmail();
+        nickname = reqDto.getNickname();
     }
 
 }

@@ -5,8 +5,10 @@ import com.smallsquare.modules.user.infrastructure.security.model.CustomUserDeta
 import com.smallsquare.modules.user.web.dto.request.UserLogoutReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserLoginReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
+import com.smallsquare.modules.user.web.dto.request.UserUpdateReqDto;
 import com.smallsquare.modules.user.web.dto.response.UserInfoResDto;
 import com.smallsquare.modules.user.web.dto.response.UserLoginResDto;
+import com.smallsquare.modules.user.web.dto.response.UserUpdateResDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -62,6 +64,18 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserInfoResDto> me(@AuthenticationPrincipal CustomUserDetails userDetails) {
         UserInfoResDto resDto = userService.me(userDetails.getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(resDto);
+    }
+
+    /**
+     * 회원정보 수정
+     * @param userDetails
+     * @param reqDto
+     * @return
+     */
+    @PatchMapping("/me")
+    public ResponseEntity<UserUpdateResDto> updateMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody UserUpdateReqDto reqDto) {
+        UserUpdateResDto resDto = userService.updateUserInfo(userDetails.getUserId(), reqDto);
         return ResponseEntity.status(HttpStatus.OK).body(resDto);
     }
 }

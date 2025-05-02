@@ -8,12 +8,10 @@ import com.smallsquare.modules.user.infrastructure.jwt.JwtProvider;
 import com.smallsquare.modules.user.infrastructure.jwt.JwtUtil;
 import com.smallsquare.modules.user.infrastructure.redis.RedisService;
 import com.smallsquare.modules.user.infrastructure.repository.JpaUserRepository;
-import com.smallsquare.modules.user.web.dto.request.UserLogoutReqDto;
-import com.smallsquare.modules.user.web.dto.request.JwtTokenReqDto;
-import com.smallsquare.modules.user.web.dto.request.UserLoginReqDto;
-import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
+import com.smallsquare.modules.user.web.dto.request.*;
 import com.smallsquare.modules.user.web.dto.response.UserInfoResDto;
 import com.smallsquare.modules.user.web.dto.response.UserLoginResDto;
+import com.smallsquare.modules.user.web.dto.response.UserUpdateResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,7 +36,7 @@ public class UserService {
     /**
      * 회원가입
      * @param: UserSignupReqDto
-     * @Returns: 201 Created
+     * @Returns: void
      */
     @Transactional
     public void signup(UserSignupReqDto reqDto) {
@@ -85,6 +83,7 @@ public class UserService {
      * 이후 인증이나 토큰 재발급 때 검증 로직을 추가
      * @param reqDto
      */
+    @Transactional
     public void logout(UserLogoutReqDto reqDto) {
 
         // 1. 토큰 추출
@@ -110,6 +109,26 @@ public class UserService {
                  .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     }
 
+    /**
+     * 회원정보 수정
+     * @param userId, reqDto (username, name, email, nickname)
+     * @return UserUpdateResDto (username, name, email, nickname)
+     */
+    @Transactional
+    public UserUpdateResDto updateUserInfo(Long userId, UserUpdateReqDto reqDto) {
+        User user = userRepository.findById(userId).orElseThrow(); // db에서 데이터를 가져와서 1차 캐시에 저장 (영속상태)
+        // 영속 객체의 필드 값 변경 (더티 체킹 발생) -> Transactional 범위가 끝날 때 변경 감지 -> 감지되면 update 쿼리 실행
+        user.updateInfo(reqDto);
+
+        UserUpdateResDto resDto = UserUpdateResDto.builder()
+                .username(user.getUsername())
+                .name(user.getName())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .build();
+
+        return resDto;
+    }
 
     /**
      * username, nickname, email 중복검사
@@ -164,4 +183,5 @@ public class UserService {
             throw new UserException(PASSWORD_MISMATCH);
         }
     }
+
 }
