@@ -16,7 +16,9 @@ public enum UserErrorCode {
     USER_NOT_FOUND("회원을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     PASSWORD_MISMATCH("비밀번호와 비밀번호 확인이 일치하지 않습니다.", HttpStatus.CONFLICT),
     ACCESS_TOKEN_EXPIRED("이미 만료된 Access Token입니다.", HttpStatus.CONFLICT),
-    REFRESH_TOKEN_EXPIRED("이미 만료된 Refresh Token입니다.", HttpStatus.CONFLICT);
+    REFRESH_TOKEN_EXPIRED("이미 만료된 Refresh Token입니다.", HttpStatus.CONFLICT),
+    INACTIVE_ACCOUNT("탈퇴한 회원 계정입니다.", HttpStatus.FORBIDDEN);
+
 
     private final String message;
     private final HttpStatus status;

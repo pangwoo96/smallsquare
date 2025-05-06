@@ -43,5 +43,10 @@ public class UserRepositoryImpl implements UserRepository {
         return jpaUserRepository.save(user);
     }
 
+    @Override
+    public void deleteById(Long userId) {
+        jpaUserRepository.deleteById(userId);
+    }
+
 
 }

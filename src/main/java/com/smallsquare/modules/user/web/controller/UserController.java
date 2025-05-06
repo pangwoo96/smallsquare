@@ -2,10 +2,7 @@ package com.smallsquare.modules.user.web.controller;
 
 import com.smallsquare.modules.user.application.service.UserService;
 import com.smallsquare.modules.user.infrastructure.security.model.CustomUserDetails;
-import com.smallsquare.modules.user.web.dto.request.UserLogoutReqDto;
-import com.smallsquare.modules.user.web.dto.request.UserLoginReqDto;
-import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
-import com.smallsquare.modules.user.web.dto.request.UserUpdateReqDto;
+import com.smallsquare.modules.user.web.dto.request.*;
 import com.smallsquare.modules.user.web.dto.response.UserInfoResDto;
 import com.smallsquare.modules.user.web.dto.response.UserLoginResDto;
 import com.smallsquare.modules.user.web.dto.response.UserUpdateResDto;
@@ -74,8 +71,17 @@ public class UserController {
      * @return
      */
     @PatchMapping("/me")
-    public ResponseEntity<UserUpdateResDto> updateMyInfo(@Valid @AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody UserUpdateReqDto reqDto) {
+    public ResponseEntity<UserUpdateResDto> updateMyInfo(@Valid @AuthenticationPrincipal CustomUserDetails userDetails,
+                                                         @RequestBody UserUpdateReqDto reqDto) {
         UserUpdateResDto resDto = userService.updateUserInfo(userDetails.getUserId(), reqDto);
         return ResponseEntity.status(HttpStatus.OK).body(resDto);
     }
+
+    @DeleteMapping("me")
+    public ResponseEntity<Void> deleteMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                             @RequestBody UserDeleteReqDto reqDto) {
+        userService.deleteUser(userDetails.getUserId(), reqDto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }
