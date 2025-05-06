@@ -64,9 +64,14 @@ public class UserService {
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
         // 2. 비밀번호가 입력한 것과 DB의 비밀번호가 일치하는지 확인
-        validatePassword(reqDto, user);
+        validatePassword(reqDto.getPassword(), user);
 
-        // 3. 토큰 생성
+        // 3. 탈퇴한 유저인지 검증
+        if (!user.isActive()) {
+            throw new UserException(INACTIVE_ACCOUNT);
+        }
+
+        // 4. 토큰 생성
         JwtTokenReqDto tokenReqDto = createTokenDto(user);
 
         String accessToken = jwtProvider.createAccessToken(tokenReqDto);
@@ -131,6 +136,23 @@ public class UserService {
     }
 
     /**
+     * 회원 탈퇴 기능
+     * @param userId, reqDto
+     */
+    @Transactional
+    public void deleteUser(Long userId, UserDeleteReqDto reqDto) {
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserException(USER_NOT_FOUND));
+
+        // 1. 비밀번호가 일치하는지 확인
+        validatePassword(reqDto.getPassword(), user);
+
+        // 2. User 테이블의 isActive를 false로 변경
+        user.deactivate();
+
+    }
+
+    /**
      * username, nickname, email 중복검사
      * @param reqDto
      */
@@ -149,11 +171,11 @@ public class UserService {
     /**
      * 입력한 비밀번호와 DB의 비밀번호가 서로 일치하는지 확인
      * @note mathes()는 인코딩 안된 평문 비밀번호와 인코딩된 비밀번호를 비교하도록 설계된 메소드
-     * @param reqDto
+     * @param password
      * @param user
      */
-    private void validatePassword(UserLoginReqDto reqDto, User user) {
-        if (!passwordEncoder.matches(reqDto.getPassword(), user.getPassword())) {
+    private void validatePassword(String password, User user) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new UserException(PASSWORD_NOT_MATCHED);
         }
     }
@@ -183,5 +205,4 @@ public class UserService {
             throw new UserException(PASSWORD_MISMATCH);
         }
     }
-
 }

@@ -275,6 +275,7 @@ public class UserServiceIntegrationTest {
     }
 
     @Test
+    @Order(9)
     void 내정보조회_실패_없는_유저() {
         Long nonExistentUserId = 9999L;
 
