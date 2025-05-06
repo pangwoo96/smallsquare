@@ -77,11 +77,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(resDto);
     }
 
-    @DeleteMapping("me")
+    @DeleteMapping("/me")
     public ResponseEntity<Void> deleteMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails,
                                              @RequestBody UserDeleteReqDto reqDto) {
         userService.deleteUser(userDetails.getUserId(), reqDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("/find/password")
+    public ResponseEntity<Void> findAndChangePassword(@Valid @RequestBody UserFindPasswordReqDto reqDto) {
+        userService.findAndChangePassword(reqDto);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

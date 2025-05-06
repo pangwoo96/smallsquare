@@ -2,7 +2,7 @@ package com.smallsquare.modules.user.web.dto.response;
 
 import lombok.*;
 
-@Getter @Setter @Builder
+@Getter @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserLoginResDto {

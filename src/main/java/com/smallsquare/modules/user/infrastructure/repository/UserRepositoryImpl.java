@@ -44,9 +44,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void deleteById(Long userId) {
-        jpaUserRepository.deleteById(userId);
+    public Optional<User> findByEmail(String email) {
+        return jpaUserRepository.findByEmail(email);
     }
-
-
 }

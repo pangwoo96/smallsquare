@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = UserController.class)
 @AutoConfigureMockMvc(addFilters = false)  // Security 필터 비활성화 (필요하면)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class UserControllerTest {
+class UserPasswordChangeReqDtoControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -3,7 +3,7 @@ package com.smallsquare.modules.user.web.dto.request;
 import com.smallsquare.modules.user.domain.enums.Role;
 import lombok.*;
 
-@Getter @Setter @Builder
+@Getter @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class JwtTokenReqDto {
