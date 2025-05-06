@@ -30,6 +30,8 @@ public class User extends BaseTimeEntity {
 
     private String name;
 
+    private boolean isActive;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -40,6 +42,7 @@ public class User extends BaseTimeEntity {
                 .nickname(reqDto.getNickname())
                 .email(reqDto.getEmail())
                 .name(reqDto.getName())
+                .isActive(true)
                 .role(reqDto.getRole())
                 .build();
     }
@@ -49,6 +52,10 @@ public class User extends BaseTimeEntity {
         name = reqDto.getName();
         email = reqDto.getEmail();
         nickname = reqDto.getNickname();
+    }
+
+    public void deactivate() {
+        this.isActive = false;
     }
 
 }
