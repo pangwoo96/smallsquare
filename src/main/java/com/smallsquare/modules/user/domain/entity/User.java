@@ -30,7 +30,7 @@ public class User extends BaseTimeEntity {
 
     private String name;
 
-    private boolean isActive;
+    private Boolean isActive;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -55,7 +55,7 @@ public class User extends BaseTimeEntity {
     }
 
     public void deactivate() {
-        this.isActive = false;
+        isActive = false;
     }
 
 }

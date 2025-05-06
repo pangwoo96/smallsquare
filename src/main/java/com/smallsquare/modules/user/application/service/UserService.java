@@ -67,7 +67,7 @@ public class UserService {
         validatePassword(reqDto.getPassword(), user);
 
         // 3. 탈퇴한 유저인지 검증
-        if (!user.isActive()) {
+        if (!user.getIsActive()) {
             throw new UserException(INACTIVE_ACCOUNT);
         }
 
