@@ -43,6 +43,9 @@ public class UserService {
         // 2. 비밀번호와 비밀번호 확인이 일치하는지 확인
         validatePasswordMatch(reqDto.getPassword(), reqDto.getCheckPassword());
 
+        // 3. 이메일 인증이 이루어졌는지 확인
+        verifyEmail(reqDto.getEmail());
+
         // 3. DTO의 필드와 비밀번호를 인코딩해서 User 객체로 변환 후 저장
         User user = User.of(reqDto, passwordEncoder.encode(reqDto.getPassword()));
         userRepository.save(user);
@@ -156,7 +159,7 @@ public class UserService {
         validatePasswordMatch(reqDto.getPassword(), reqDto.getCheckPassword());
 
         // 2. redis키로 이메일을 추출
-        String redisKey = "findPassword:token" + reqDto.getPasswordToken();
+        String redisKey = "findPassword:token:" + reqDto.getPasswordToken();
         String email = redisService.get(redisKey);
 
         // 3. 해당 email을 가지고 있는 User 조회
@@ -228,9 +231,27 @@ public class UserService {
         }
     }
 
+    /**
+     * 새로 변경된 비밀번호가 이전 비밀번호과 동일한지 확인하는 로직
+     * @param newPassword
+     * @param oldPassword
+     */
+
     private void validateNewPasswordIsNotSameAsOld(String newPassword, String oldPassword) {
         if (passwordEncoder.matches(newPassword, oldPassword)) {
             throw new UserException(SAME_AS_OLD_PASSWORD); // 예외 코드는 너 프로젝트 기준에 맞게 정의
+        }
+    }
+
+    /**
+     * 이메일 인증응 확인하는 로직
+     * @param email
+     */
+
+    private void verifyEmail(String email) {
+        String status = redisService.get("verifyEmail:email:" + email);
+        if(!status.equals("true")) {
+            throw new UserException(EMAIL_NOT_VERIFIED);
         }
     }
 

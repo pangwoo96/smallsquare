@@ -19,7 +19,8 @@ public enum UserErrorCode {
     REFRESH_TOKEN_EXPIRED("이미 만료된 Refresh Token입니다.", HttpStatus.CONFLICT),
     INACTIVE_ACCOUNT("탈퇴한 회원 계정입니다.", HttpStatus.FORBIDDEN),
     EMAIL_NOT_EXIST("존재하지 않는 이메일입니다.", HttpStatus.NOT_FOUND),
-    SAME_AS_OLD_PASSWORD("이전과 동일한 비밀번호는 사용할 수 없습니다.", HttpStatus.CONFLICT);
+    SAME_AS_OLD_PASSWORD("이전과 동일한 비밀번호는 사용할 수 없습니다.", HttpStatus.CONFLICT),
+    EMAIL_NOT_VERIFIED("이메일 인증이 완료되지 않았습니다.", HttpStatus.CONFLICT);
 
 
     private final String message;
