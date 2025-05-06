@@ -3,7 +3,9 @@ package com.smallsquare.modules.user.integration;
 import com.smallsquare.common.exception.exception.UserException;
 import com.smallsquare.modules.user.application.service.UserService;
 import com.smallsquare.modules.user.domain.entity.User;
+import com.smallsquare.modules.user.domain.repository.UserRepository;
 import com.smallsquare.modules.user.infrastructure.repository.JpaUserRepository;
+import com.smallsquare.modules.user.web.dto.request.UserDeleteReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserLoginReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserUpdateReqDto;
@@ -36,6 +38,8 @@ public class UserServiceIntegrationTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepository;
 
     // 공통 유틸 함수로 분리
     private Long createAndGetUserId(String username) {
@@ -276,7 +280,7 @@ public class UserServiceIntegrationTest {
 
     @Test
     @Order(9)
-    void 내정보조회_실패_없는_유저() {
+    void 내_정보_조회_실패_없는_유저() {
         Long nonExistentUserId = 9999L;
 
         UserUpdateReqDto updateDto = UserUpdateReqDto.builder()
@@ -287,6 +291,43 @@ public class UserServiceIntegrationTest {
                 .build();
 
         assertThrows(UserException.class, () -> userService.updateUserInfo(nonExistentUserId, updateDto));
+    }
+
+    @Test
+    @Order(10)
+    void 회원_탈퇴_성공() {
+
+        // given
+        Long userId = createAndGetUserId("testuser");
+
+        User user = userRepository.findById(userId).orElseThrow();
+
+        UserDeleteReqDto reqDto = UserDeleteReqDto.builder()
+                .password("password1")
+                .build();
+
+        //when
+        userService.deleteUser(userId, reqDto);
+
+        // then
+        assertEquals(false, user.getIsActive());
+    }
+
+    @Test
+    @Order(11)
+    void 회원_탈퇴_실패_비밀번호_불일치() {
+
+        // given
+        Long userId = createAndGetUserId("testuser");
+
+        User user = userRepository.findById(userId).orElseThrow();
+
+        UserDeleteReqDto reqDto = UserDeleteReqDto.builder()
+                .password("password2")
+                .build();
+
+        //when & then
+        assertThrows(UserException.class, () -> userService.deleteUser(userId, reqDto));
     }
 
 }
