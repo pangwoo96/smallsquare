@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class) // Order(n)에 따라 순서 보장
-public class UserServiceIntegrationTest {
+public class UserPasswordChangeReqDtoServiceIntegrationTest {
 
     @Autowired
     private UserService userService;

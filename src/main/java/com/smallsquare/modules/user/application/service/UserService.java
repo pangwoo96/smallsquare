@@ -7,7 +7,6 @@ import com.smallsquare.modules.user.domain.repository.UserRepository;
 import com.smallsquare.modules.user.infrastructure.jwt.JwtProvider;
 import com.smallsquare.modules.user.infrastructure.jwt.JwtUtil;
 import com.smallsquare.modules.user.infrastructure.redis.RedisService;
-import com.smallsquare.modules.user.infrastructure.repository.JpaUserRepository;
 import com.smallsquare.modules.user.web.dto.request.*;
 import com.smallsquare.modules.user.web.dto.response.UserInfoResDto;
 import com.smallsquare.modules.user.web.dto.response.UserLoginResDto;
@@ -16,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static com.smallsquare.common.exception.errorCode.UserErrorCode.*;
 
@@ -44,7 +41,7 @@ public class UserService {
         validateDuplicate(reqDto);
 
         // 2. 비밀번호와 비밀번호 확인이 일치하는지 확인
-        validatePasswordMatch(reqDto);
+        validatePasswordMatch(reqDto.getPassword(), reqDto.getCheckPassword());
 
         // 3. DTO의 필드와 비밀번호를 인코딩해서 User 객체로 변환 후 저장
         User user = User.of(reqDto, passwordEncoder.encode(reqDto.getPassword()));
@@ -152,6 +149,31 @@ public class UserService {
 
     }
 
+    @Transactional
+    public void findAndChangePassword(UserFindPasswordReqDto reqDto) {
+
+        // 1. 비밀번호 일치 여부 확인
+        validatePasswordMatch(reqDto.getPassword(), reqDto.getCheckPassword());
+
+        // 2. redis키로 이메일을 추출
+        String redisKey = "findPassword:token" + reqDto.getPasswordToken();
+        String email = redisService.get(redisKey);
+
+        // 3. 해당 email을 가지고 있는 User 조회
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserException(USER_NOT_FOUND));
+
+        // 4. 이전 비밀번호와 동일하다면 예외 발생
+        validateNewPasswordIsNotSameAsOld(reqDto.getPassword(), user.getPassword());
+
+        // 5. 비밀번호 업데이트
+        String newPassword = passwordEncoder.encode(reqDto.getPassword());
+        user.updatePassword(newPassword);
+
+        // 6. redis에 해당 키 삭제
+        redisService.delete(redisKey);
+
+    }
+
     /**
      * username, nickname, email 중복검사
      * @param reqDto
@@ -198,11 +220,18 @@ public class UserService {
 
     /**
      * 비밀번호 & 비밀번호 확인이 서로 일치하는지 확인하는 로직
-     * @param reqDto
+     * @param password, checkPassword
      */
-    private void validatePasswordMatch(UserSignupReqDto reqDto) {
-        if (!reqDto.getPassword().equals(reqDto.getCheckPassword())) {
+    private void validatePasswordMatch(String password, String checkPassword) {
+        if (!password.equals(checkPassword)) {
             throw new UserException(PASSWORD_MISMATCH);
         }
     }
+
+    private void validateNewPasswordIsNotSameAsOld(String newPassword, String oldPassword) {
+        if (passwordEncoder.matches(newPassword, oldPassword)) {
+            throw new UserException(SAME_AS_OLD_PASSWORD); // 예외 코드는 너 프로젝트 기준에 맞게 정의
+        }
+    }
+
 }

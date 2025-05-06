@@ -58,4 +58,8 @@ public class User extends BaseTimeEntity {
         isActive = false;
     }
 
+    public void updatePassword(String newPassword) {
+        password = newPassword;
+    }
+
 }
