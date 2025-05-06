@@ -122,7 +122,6 @@ public class UserService {
     @Transactional
     public UserUpdateResDto updateUserInfo(Long userId, UserUpdateReqDto reqDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserException(USER_NOT_FOUND)); // db에서 데이터를 가져와서 1차 캐시에 저장 (영속상태)
-
         // 영속 객체의 필드 값 변경 (더티 체킹 발생) -> Transactional 범위가 끝날 때 변경 감지 -> 감지되면 update 쿼리 실행
         user.updateInfo(reqDto);
 
