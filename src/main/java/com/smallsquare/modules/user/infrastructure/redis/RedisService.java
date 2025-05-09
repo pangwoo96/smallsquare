@@ -53,6 +53,10 @@ public class RedisService {
         }
     }
 
+    public void set(String key, String value, long expirationSeconds) {
+        redisTemplate.opsForValue().set(key, value, Duration.ofMinutes(expirationSeconds));
+    }
+
     // 토큰을 기반으로 Redis에서 값(email) 조회
     public String get(String key) {
         return redisTemplate.opsForValue().get(key);

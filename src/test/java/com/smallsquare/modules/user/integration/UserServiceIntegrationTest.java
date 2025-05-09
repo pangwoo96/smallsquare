@@ -4,11 +4,9 @@ import com.smallsquare.common.exception.exception.UserException;
 import com.smallsquare.modules.user.application.service.UserService;
 import com.smallsquare.modules.user.domain.entity.User;
 import com.smallsquare.modules.user.domain.repository.UserRepository;
+import com.smallsquare.modules.user.infrastructure.redis.RedisService;
 import com.smallsquare.modules.user.infrastructure.repository.JpaUserRepository;
-import com.smallsquare.modules.user.web.dto.request.UserDeleteReqDto;
-import com.smallsquare.modules.user.web.dto.request.UserLoginReqDto;
-import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
-import com.smallsquare.modules.user.web.dto.request.UserUpdateReqDto;
+import com.smallsquare.modules.user.web.dto.request.*;
 import com.smallsquare.modules.user.web.dto.response.UserLoginResDto;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -18,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -28,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class) // Order(n)에 따라 순서 보장
-public class UserPasswordChangeReqDtoServiceIntegrationTest {
+public class UserServiceIntegrationTest {
 
     @Autowired
     private UserService userService;
@@ -38,8 +37,12 @@ public class UserPasswordChangeReqDtoServiceIntegrationTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RedisService redisService;
 
     // 공통 유틸 함수로 분리
     private Long createAndGetUserId(String username) {
@@ -51,6 +54,8 @@ public class UserPasswordChangeReqDtoServiceIntegrationTest {
                 .email("email1@test.com")
                 .name("name1")
                 .build();
+
+        redisService.set("verifyEmail:email:" + reqDto.getEmail(), "true", 5L);
 
         userService.signup(reqDto);
         return jpaUserRepository.findByUsername(username).get().getId();
@@ -70,6 +75,7 @@ public class UserPasswordChangeReqDtoServiceIntegrationTest {
                 .name("name1")
                 .build();
 
+        redisService.set("verifyEmail:email:" + reqDto.getEmail(), "true", 5L);
         // when
         userService.signup(reqDto);
         Optional<User> savedUser = jpaUserRepository.findByUsername("username1");
@@ -329,5 +335,79 @@ public class UserPasswordChangeReqDtoServiceIntegrationTest {
         //when & then
         assertThrows(UserException.class, () -> userService.deleteUser(userId, reqDto));
     }
+
+    @Test
+    @Order(12)
+    void 비밀번호_수정_성공() {
+
+        // given
+        Long userId = createAndGetUserId("testUsername");
+
+        UserPasswordChangeReqDto reqDto = UserPasswordChangeReqDto.builder()
+                .password("password1")
+                .newPassword("newPassword1")
+                .checkNewPassword("newPassword1")
+                .build();
+
+        // when
+        userService.changePassword(userId, reqDto);
+        User user = userRepository.findById(userId).orElseThrow();
+
+        // then
+        assertTrue(passwordEncoder.matches(reqDto.getNewPassword(), user.getPassword()));
+    }
+
+    @Test
+    @Order(13)
+    void 비밀번호_수정_실패_현재_비밀번호_불일치() {
+
+        // given
+        Long userId = createAndGetUserId("testUsername");
+
+        UserPasswordChangeReqDto reqDto = UserPasswordChangeReqDto.builder()
+                .password("wrongPassword")
+                .newPassword("newPassword1")
+                .checkNewPassword("newPassword1")
+                .build();
+
+        // when & then
+        assertThrows(UserException.class, () -> userService.changePassword(userId, reqDto));
+    }
+
+    @Test
+    @Order(14)
+    void 비밀번호_수정_실패_비밀번호_확인_불일치() {
+
+        // given
+        Long userId = createAndGetUserId("testUsername");
+
+        UserPasswordChangeReqDto reqDto = UserPasswordChangeReqDto.builder()
+                .password("password1")
+                .newPassword("newPassword1")
+                .checkNewPassword("newPassword2")
+                .build();
+
+        // when & then
+        assertThrows(UserException.class, () -> userService.changePassword(userId, reqDto));
+    }
+
+    @Test
+    @Order(15)
+    void 비밀번호_수정_실패_기존_비밀번호와_일치() {
+
+        // given
+        Long userId = createAndGetUserId("testUsername");
+
+        UserPasswordChangeReqDto reqDto = UserPasswordChangeReqDto.builder()
+                .password("password1")
+                .newPassword("password1")
+                .checkNewPassword("password1")
+                .build();
+
+        // when & then
+        assertThrows(UserException.class, () -> userService.changePassword(userId, reqDto));
+    }
+
+
 
 }
