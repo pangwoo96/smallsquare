@@ -264,6 +264,7 @@ public class UserService {
         }
         if (userRepository.existsByNickname(reqDto.getNickname())) {
             throw new UserException(DUPLICATED_NICKNAME);
+
         }
     }
 
