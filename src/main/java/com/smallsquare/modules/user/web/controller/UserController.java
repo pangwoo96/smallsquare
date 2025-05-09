@@ -47,7 +47,6 @@ public class UserController {
      * @param reqDto : accessToken, refreshToken
      * @return 200 Success
      */
-
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody UserLogoutReqDto reqDto) {
         userService.logout(reqDto);
@@ -77,6 +76,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(resDto);
     }
 
+    /**
+     * 회원 탈퇴
+     * @param userDetails
+     * @param reqDto
+     * @return
+     */
     @DeleteMapping("/me")
     public ResponseEntity<Void> deleteMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails,
                                              @RequestBody UserDeleteReqDto reqDto) {
@@ -84,9 +89,28 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/find/password")
+    /**
+     * 비밀번호 찾기 (비밀번호를 잊어버렸을 때)
+     * @param reqDto
+     * @return
+     */
+    @PostMapping("/password/reset")
     public ResponseEntity<Void> findAndChangePassword(@Valid @RequestBody UserFindPasswordReqDto reqDto) {
         userService.findAndChangePassword(reqDto);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 비밀번호 변경 (마이페이지 or 로그인 된 상태에서)
+     * @param userDetails
+     * @param reqDto
+     * @return
+     */
+
+    @PatchMapping("/password")
+    public ResponseEntity<Void> changePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                               @RequestBody UserPasswordChangeReqDto reqDto) {
+        userService.changePassword(userDetails.getUserId(), reqDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

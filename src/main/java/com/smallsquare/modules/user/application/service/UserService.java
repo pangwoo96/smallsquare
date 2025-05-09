@@ -64,7 +64,7 @@ public class UserService {
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
         // 2. 비밀번호가 입력한 것과 DB의 비밀번호가 일치하는지 확인
-        validatePassword(reqDto.getPassword(), user);
+        validatePassword(reqDto.getPassword(), user.getPassword());
 
         // 3. 탈퇴한 유저인지 검증
         if (!user.getIsActive()) {
@@ -145,7 +145,7 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
         // 1. 비밀번호가 일치하는지 확인
-        validatePassword(reqDto.getPassword(), user);
+        validatePassword(reqDto.getPassword(), user.getPassword());
 
         // 2. User 테이블의 isActive를 false로 변경
         user.deactivate();
@@ -177,6 +177,31 @@ public class UserService {
 
     }
 
+    @Transactional
+    public void changePassword(Long userId, UserPasswordChangeReqDto reqDto) {
+
+        // 1. 입력한 비밀번호가 DB의 비밀번호와 일치하는지 확인
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserException(USER_NOT_FOUND));
+        validatePassword(reqDto.getPassword(), user.getPassword());
+
+        // 2. 새로 입력한 비밀번호와 비밀번호 확인이 서로 일치하는지 확인
+        validatePasswordMatch(reqDto.getNewPassword(), reqDto.getCheckNewPassword());
+
+        // 3. 기존 비밀번호와 새로 입력한 비밀번호가 같은 경우
+        validateNewPasswordIsNotSameAsOld(reqDto.getNewPassword(), user.getPassword());
+
+        // 4. 비밀번호 인코딩
+        String newPassword = passwordEncoder.encode(reqDto.getNewPassword());
+
+        // 5. 유저의 비밀번호를 새로운 비밀번호로 변경
+        user.updatePassword(newPassword);
+    }
+
+
+
+
+    // ==================== 검증 & 편의 메소드 ==================== //
+
     /**
      * username, nickname, email 중복검사
      * @param reqDto
@@ -197,10 +222,10 @@ public class UserService {
      * 입력한 비밀번호와 DB의 비밀번호가 서로 일치하는지 확인
      * @note mathes()는 인코딩 안된 평문 비밀번호와 인코딩된 비밀번호를 비교하도록 설계된 메소드
      * @param password
-     * @param user
+     * @param inputPassword
      */
-    private void validatePassword(String password, User user) {
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+    private void validatePassword(String password, String inputPassword) {
+        if (!passwordEncoder.matches(password, inputPassword)) {
             throw new UserException(PASSWORD_NOT_MATCHED);
         }
     }
@@ -239,7 +264,7 @@ public class UserService {
 
     private void validateNewPasswordIsNotSameAsOld(String newPassword, String oldPassword) {
         if (passwordEncoder.matches(newPassword, oldPassword)) {
-            throw new UserException(SAME_AS_OLD_PASSWORD); // 예외 코드는 너 프로젝트 기준에 맞게 정의
+            throw new UserException(SAME_AS_OLD_PASSWORD);
         }
     }
 
@@ -254,5 +279,4 @@ public class UserService {
             throw new UserException(EMAIL_NOT_VERIFIED);
         }
     }
-
 }
