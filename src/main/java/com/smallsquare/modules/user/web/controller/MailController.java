@@ -16,18 +16,33 @@ public class MailController {
 
     private final MailService mailService;
 
+    /**
+     * 비밀번호 찾기 이메일 발송
+     * @param reqDto
+     * @return
+     */
     @PostMapping("/find/password")
     public ResponseEntity<Void> sendPasswordMail(@Valid @RequestBody MailReqDto reqDto) {
         mailService.sendFindAndResetPassword(reqDto.getEmail());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /**
+     * 비밀번호 검증 용 이메일 발송(회원가입 시)
+     * @param reqDto
+     * @return
+     */
     @PostMapping("/sendVerifyEmail")
     public ResponseEntity<Void> sendVerifyEmail(@Valid @RequestBody MailReqDto reqDto) {
         mailService.sendVerifyEmail(reqDto.getEmail());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /**
+     * 비밀번호 검증 (회원가입 시) -> 인증상태 유지하고 최종 회원가입 때 재확인
+     * @param reqDto
+     * @return
+     */
     @PostMapping("/verifyEmail")
     public ResponseEntity<Void> verifyEmail(@Valid @RequestBody UserVerifyEmailReqDto reqDto) {
         mailService.verifyEmail(reqDto.getVerifyEmailToken());
