@@ -41,6 +41,14 @@ public class RedisService {
         );
     }
 
+    public void saveRefreshBlackList(String refreshToken, long refreshTokenExpireTime) {
+        redisTemplate.opsForValue().set(
+                "blacklist:refresh:" + refreshToken,
+                "refresh",
+                Duration.ofMinutes(refreshTokenExpireTime)
+        );
+    }
+
     public void validateAccessToken(String accessToken) {
         if (redisTemplate.hasKey("blacklist:access:" + accessToken)) {
             throw new UserException(ACCESS_TOKEN_EXPIRED);

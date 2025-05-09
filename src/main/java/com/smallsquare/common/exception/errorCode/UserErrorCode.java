@@ -20,7 +20,8 @@ public enum UserErrorCode {
     INACTIVE_ACCOUNT("탈퇴한 회원 계정입니다.", HttpStatus.FORBIDDEN),
     EMAIL_NOT_EXIST("존재하지 않는 이메일입니다.", HttpStatus.NOT_FOUND),
     SAME_AS_OLD_PASSWORD("이전과 동일한 비밀번호는 사용할 수 없습니다.", HttpStatus.CONFLICT),
-    EMAIL_NOT_VERIFIED("이메일 인증이 완료되지 않았습니다.", HttpStatus.CONFLICT);
+    EMAIL_NOT_VERIFIED("이메일 인증이 완료되지 않았습니다.", HttpStatus.CONFLICT),
+    EXPIRED_REFRESH_TOKEN("폐기된 리프레시 토큰입니다.", HttpStatus.CONFLICT);
 
 
     private final String message;

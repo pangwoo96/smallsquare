@@ -106,12 +106,17 @@ public class UserController {
      * @param reqDto
      * @return
      */
-
     @PatchMapping("/password")
     public ResponseEntity<Void> changePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                @RequestBody UserPasswordChangeReqDto reqDto) {
         userService.changePassword(userDetails.getUserId(), reqDto);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<UserLoginResDto> refreshToken(@RequestHeader("RefreshToken") String refreshToken) {
+        UserLoginResDto resDto = userService.refreshToken(refreshToken);
+        return ResponseEntity.status(HttpStatus.OK).body(resDto);
     }
 
 }

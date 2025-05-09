@@ -2,6 +2,7 @@ package com.smallsquare.modules.user.application.service;
 
 import com.smallsquare.common.exception.exception.UserException;
 import com.smallsquare.modules.user.domain.entity.User;
+import com.smallsquare.modules.user.domain.enums.Role;
 import com.smallsquare.modules.user.domain.repository.UserQueryRepository;
 import com.smallsquare.modules.user.domain.repository.UserRepository;
 import com.smallsquare.modules.user.infrastructure.jwt.JwtProvider;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import static com.smallsquare.common.exception.errorCode.UserErrorCode.*;
 
@@ -44,7 +46,8 @@ public class UserService {
         validatePasswordMatch(reqDto.getPassword(), reqDto.getCheckPassword());
 
         // 3. 이메일 인증이 이루어졌는지 확인
-        verifyEmail(reqDto.getEmail());
+        // TODO: PostMan 테스트 시 너무 불편해서 주석처리 한 다음 실제 서비스할 때는 주석 제거
+        //verifyEmail(reqDto.getEmail());
 
         // 3. DTO의 필드와 비밀번호를 인코딩해서 User 객체로 변환 후 저장
         User user = User.of(reqDto, passwordEncoder.encode(reqDto.getPassword()));
@@ -177,6 +180,12 @@ public class UserService {
 
     }
 
+    /**
+     * 비밀번호 변경
+     * @param userId
+     * @param reqDto
+     */
+
     @Transactional
     public void changePassword(Long userId, UserPasswordChangeReqDto reqDto) {
 
@@ -197,6 +206,46 @@ public class UserService {
         user.updatePassword(newPassword);
     }
 
+    /**
+     * 토큰 재발급
+     * @param refreshToken
+     * @return UserLoginResDto (AccessToken, RefreshToken)
+     */
+    @Transactional
+    public UserLoginResDto refreshToken(String refreshToken) {
+
+        // 1. RefreshToken 검증
+        jwtUtil.validateToken(refreshToken);
+
+        // 2. RefreshToken이 블랙리스트인지 확인
+        validateRefreshTokenBlackList(refreshToken);
+
+        // 3. 사용자 정보 추출
+        User user = User.builder()
+                .id(jwtUtil.getUserId(refreshToken))
+                .username(jwtUtil.getUsername(refreshToken))
+                .name(jwtUtil.getName(refreshToken))
+                .email(jwtUtil.getEmail(refreshToken))
+                .nickname(jwtUtil.getNickname(refreshToken))
+                .role(Role.valueOf(jwtUtil.getRole(refreshToken)))
+                .build();
+
+        // 4. 사용된 리프레시 토큰을 블랙리스트로 저장
+        redisService.saveRefreshBlackList(refreshToken, jwtUtil.getRemainingExpirationMillis(refreshToken));
+
+        // 5. Token에 사용자 정보를 담기
+        JwtTokenReqDto userInfo = createTokenDto(user);
+
+        // 6. 새로운 엑세스 토큰과 리프레시 토큰을 만들고 반환
+        String newAccessToken = jwtProvider.createAccessToken(userInfo);
+        String newRefreshToken = jwtProvider.createRefreshToken(userInfo);
+
+        return UserLoginResDto.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
+
+    }
 
 
 
@@ -271,6 +320,7 @@ public class UserService {
     /**
      * 이메일 인증응 확인하는 로직
      * @param email
+     * 개발 단계에서는 잠시 미사용 (회원 가입 시 매번 redis에 값을 넣어줘야해서 번거로움)
      */
 
     private void verifyEmail(String email) {
@@ -279,4 +329,16 @@ public class UserService {
             throw new UserException(EMAIL_NOT_VERIFIED);
         }
     }
+
+    /**
+     * 토큰 재발급 시 기존 폐기된 리프레시 토큰이 사용되었는지 확인하는 로직
+     * @param refreshToken
+     */
+    private void validateRefreshTokenBlackList(String refreshToken) {
+        String key = redisService.get("blacklist:refresh:" + refreshToken);
+        if (StringUtils.hasText(key)) {
+            throw new UserException(EXPIRED_REFRESH_TOKEN);
+        }
+    }
+
 }
