@@ -1,7 +1,7 @@
 package com.smallsquare.modules.user.application.service;
 
 import com.smallsquare.modules.user.domain.entity.User;
-import com.smallsquare.modules.user.domain.enums.Role;
+import com.smallsquare.modules.user.domain.enums.IsActive;
 import com.smallsquare.modules.user.domain.repository.UserQueryRepository;
 import com.smallsquare.modules.user.domain.repository.UserRepository;
 import com.smallsquare.modules.user.domain.vo.*;
@@ -17,8 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static com.smallsquare.modules.user.exception.errorCode.UserErrorCode.*;
 
@@ -94,7 +92,7 @@ public class UserService {
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
         // 3. 탈퇴한 유저인지 검증
-        if (!user.getIsActive()) {
+        if (user.getIsActive() == IsActive.INACTIVE) {
             throw new UserException(INACTIVE_ACCOUNT);
         }
 
@@ -206,7 +204,7 @@ public class UserService {
             throw new UserException(PASSWORD_NOT_MATCHED);
         }
 
-        // 2. User 테이블의 isActive를 false로 변경
+        // 2. User 테이블의 isActive를 INACTIVE로 변경
         user.deactivate();
 
     }
@@ -285,7 +283,7 @@ public class UserService {
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
         // 4. 탈퇴한 사용자인지 검증
-        if (user.getIsActive() == false) {
+        if (user.getIsActive() == IsActive.INACTIVE) {
             throw new UserException(INACTIVE_ACCOUNT);
         }
 
