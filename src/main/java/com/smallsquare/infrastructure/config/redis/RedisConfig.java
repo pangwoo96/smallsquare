@@ -1,4 +1,4 @@
-package com.smallsquare.config.redis;
+package com.smallsquare.infrastructure.config.redis;
 
 
 import org.springframework.context.annotation.Bean;

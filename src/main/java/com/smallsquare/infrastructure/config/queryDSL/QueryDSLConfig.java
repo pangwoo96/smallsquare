@@ -1,4 +1,4 @@
-package com.smallsquare.config.queryDSL;
+package com.smallsquare.infrastructure.config.queryDSL;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

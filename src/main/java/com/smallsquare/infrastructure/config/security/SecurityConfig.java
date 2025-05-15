@@ -1,7 +1,7 @@
-package com.smallsquare.config.security;
+package com.smallsquare.infrastructure.config.security;
 
 import com.smallsquare.modules.user.infrastructure.jwt.JwtUtil;
-import com.smallsquare.modules.user.infrastructure.security.filter.JwtFilter;
+import com.smallsquare.modules.user.infrastructure.auth.filter.JwtFilter;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

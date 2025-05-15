@@ -1,7 +1,7 @@
-package com.smallsquare.common.exception.handler;
+package com.smallsquare.common.exceptionHandler;
 
-import com.smallsquare.common.exception.errorCode.UserErrorCode;
-import com.smallsquare.common.exception.exception.UserException;
+import com.smallsquare.modules.user.exception.errorCode.UserErrorCode;
+import com.smallsquare.modules.user.exception.exception.UserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
     // 발생한 예외를 캐치하고 상태코드와 메시지를 클라이언트에게 전달
 
     @ExceptionHandler(UserException.class)
-    public ResponseEntity<String> handleDiaryException(UserException ex) {
+    public ResponseEntity<String> handleUserException(UserException ex) {
         UserErrorCode errorCode = ex.getErrorCode();
         return ResponseEntity.status(errorCode.getStatus())
                 .body(errorCode.getMessage());

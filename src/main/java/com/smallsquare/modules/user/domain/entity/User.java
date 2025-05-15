@@ -2,6 +2,7 @@ package com.smallsquare.modules.user.domain.entity;
 
 import com.smallsquare.common.util.BaseTimeEntity;
 import com.smallsquare.modules.user.domain.enums.Role;
+import com.smallsquare.modules.user.domain.vo.*;
 import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
 import com.smallsquare.modules.user.web.dto.request.UserUpdateReqDto;
 import jakarta.persistence.*;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity @Getter @Builder
 @NoArgsConstructor
@@ -20,46 +22,51 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long id;
 
-    private String username;
+    @Embedded
+    private Username username;
 
-    private String password;
+    @Embedded
+    private Password password;
 
-    private String nickname;
+    @Embedded
+    private Nickname nickname;
 
-    private String email;
+    @Embedded
+    private Email email;
 
-    private String name;
+    @Embedded
+    private Name name;
 
     private Boolean isActive;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public static User of(UserSignupReqDto reqDto, String password) {
+    public static User of(Username username, Password password, Email email, Nickname nickname, Name name) {
         return User.builder()
-                .username(reqDto.getUsername())
+                .username(username)
                 .password(password)
-                .nickname(reqDto.getNickname())
-                .email(reqDto.getEmail())
-                .name(reqDto.getName())
+                .nickname(nickname)
+                .email(email)
+                .name(name)
                 .isActive(true)
-                .role(reqDto.getRole())
+                .role(Role.USER)
                 .build();
     }
 
-    public void updateInfo(UserUpdateReqDto reqDto) {
-        username = reqDto.getUsername();
-        name = reqDto.getName();
-        email = reqDto.getEmail();
-        nickname = reqDto.getNickname();
+    public void updateInfo(UserUpdateReqDto reqDto,Username newUsername, Email newEmail, Nickname newNickName, Name newName) {
+        username = newUsername;
+        name = newName;
+        email = newEmail;
+        nickname = newNickName;
     }
 
     public void deactivate() {
         isActive = false;
     }
 
-    public void updatePassword(String newPassword) {
-        password = newPassword;
+    public void updatePassword(String newRowPassword, PasswordEncoder passwordEncoder) {
+        password = new Password(newRowPassword, passwordEncoder);
     }
 
 }

@@ -1,7 +1,7 @@
-package com.smallsquare.modules.user.infrastructure.security.filter;
+package com.smallsquare.modules.user.infrastructure.auth.filter;
 
 import com.smallsquare.modules.user.infrastructure.jwt.JwtUtil;
-import com.smallsquare.modules.user.infrastructure.security.model.CustomUserDetails;
+import com.smallsquare.modules.user.infrastructure.auth.model.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

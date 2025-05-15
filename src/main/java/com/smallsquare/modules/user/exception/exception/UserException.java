@@ -1,6 +1,6 @@
-package com.smallsquare.common.exception.exception;
+package com.smallsquare.modules.user.exception.exception;
 
-import com.smallsquare.common.exception.errorCode.UserErrorCode;
+import com.smallsquare.modules.user.exception.errorCode.UserErrorCode;
 import lombok.Getter;
 
 @Getter

@@ -1,7 +1,7 @@
 package com.smallsquare.modules.user.web.controller;
 
 import com.smallsquare.modules.user.application.service.UserService;
-import com.smallsquare.modules.user.infrastructure.security.model.CustomUserDetails;
+import com.smallsquare.modules.user.infrastructure.auth.model.CustomUserDetails;
 import com.smallsquare.modules.user.web.dto.request.*;
 import com.smallsquare.modules.user.web.dto.response.UserInfoResDto;
 import com.smallsquare.modules.user.web.dto.response.UserLoginResDto;
@@ -112,6 +112,12 @@ public class UserController {
         userService.changePassword(userDetails.getUserId(), reqDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    /**
+     * 비밀번호 재발급
+     * @param refreshToken
+     * @return
+     */
 
     @PostMapping("/refresh-token")
     public ResponseEntity<UserLoginResDto> refreshToken(@RequestHeader("RefreshToken") String refreshToken) {

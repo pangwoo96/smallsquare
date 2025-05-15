@@ -1,15 +1,14 @@
 package com.smallsquare.modules.user.infrastructure.redis;
 
-import com.smallsquare.common.exception.exception.UserException;
-import com.smallsquare.modules.user.web.dto.request.MailReqDto;
+import com.smallsquare.modules.user.exception.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
-import static com.smallsquare.common.exception.errorCode.UserErrorCode.ACCESS_TOKEN_EXPIRED;
-import static com.smallsquare.common.exception.errorCode.UserErrorCode.REFRESH_TOKEN_EXPIRED;
+import static com.smallsquare.modules.user.exception.errorCode.UserErrorCode.ACCESS_TOKEN_EXPIRED;
+import static com.smallsquare.modules.user.exception.errorCode.UserErrorCode.REFRESH_TOKEN_EXPIRED;
 
 @Service
 @RequiredArgsConstructor
