@@ -197,14 +197,15 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId, UserDeleteReqDto reqDto) {
 
+        // 1. 회원 조회
         User user = userRepository.findById(userId).orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
-        // 1. 비밀번호가 일치하는지 확인
+        // 2. 비밀번호가 일치하는지 확인
         if (!user.getPassword().matchPassword(reqDto.getPassword(), passwordEncoder)) {
             throw new UserException(PASSWORD_NOT_MATCHED);
         }
 
-        // 2. User 테이블의 isActive를 INACTIVE로 변경
+        // 3. User 테이블의 isActive를 INACTIVE로 변경
         user.deactivate();
 
     }
