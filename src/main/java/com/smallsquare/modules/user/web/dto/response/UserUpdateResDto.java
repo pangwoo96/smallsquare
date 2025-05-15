@@ -1,5 +1,6 @@
 package com.smallsquare.modules.user.web.dto.response;
 
+import com.smallsquare.modules.user.domain.vo.Email;
 import lombok.*;
 
 @Getter @Builder

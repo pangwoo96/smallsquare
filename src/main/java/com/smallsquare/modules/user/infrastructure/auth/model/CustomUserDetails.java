@@ -1,4 +1,4 @@
-package com.smallsquare.modules.user.infrastructure.security.model;
+package com.smallsquare.modules.user.infrastructure.auth.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

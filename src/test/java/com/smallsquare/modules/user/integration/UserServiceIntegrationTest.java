@@ -1,6 +1,6 @@
 package com.smallsquare.modules.user.integration;
 
-import com.smallsquare.common.exception.exception.UserException;
+import com.smallsquare.modules.user.exception.exception.UserException;
 import com.smallsquare.modules.user.application.service.UserService;
 import com.smallsquare.modules.user.domain.entity.User;
 import com.smallsquare.modules.user.domain.repository.UserRepository;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
