@@ -1,6 +1,7 @@
 package com.smallsquare.modules.user.domain.entity;
 
 import com.smallsquare.common.util.BaseTimeEntity;
+import com.smallsquare.modules.user.domain.enums.IsActive;
 import com.smallsquare.modules.user.domain.enums.Role;
 import com.smallsquare.modules.user.domain.vo.*;
 import com.smallsquare.modules.user.web.dto.request.UserSignupReqDto;
@@ -37,7 +38,7 @@ public class User extends BaseTimeEntity {
     @Embedded
     private Name name;
 
-    private Boolean isActive;
+    private IsActive isActive;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -49,7 +50,7 @@ public class User extends BaseTimeEntity {
                 .nickname(nickname)
                 .email(email)
                 .name(name)
-                .isActive(true)
+                .isActive(IsActive.ACTIVE)
                 .role(Role.USER)
                 .build();
     }
@@ -62,7 +63,7 @@ public class User extends BaseTimeEntity {
     }
 
     public void deactivate() {
-        isActive = false;
+        isActive = IsActive.INACTIVE;
     }
 
     public void updatePassword(String newRowPassword, PasswordEncoder passwordEncoder) {
