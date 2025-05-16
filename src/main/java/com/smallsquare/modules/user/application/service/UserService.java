@@ -1,6 +1,7 @@
 package com.smallsquare.modules.user.application.service;
 
 import com.smallsquare.modules.user.domain.entity.User;
+import com.smallsquare.modules.user.domain.enums.IsActive;
 import com.smallsquare.modules.user.domain.enums.Role;
 import com.smallsquare.modules.user.domain.repository.UserQueryRepository;
 import com.smallsquare.modules.user.domain.repository.UserRepository;
@@ -94,7 +95,7 @@ public class UserService {
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
         // 3. 탈퇴한 유저인지 검증
-        if (!user.getIsActive()) {
+        if (user.getIsActive() == IsActive.INACTIVE) {
             throw new UserException(INACTIVE_ACCOUNT);
         }
 
@@ -179,7 +180,7 @@ public class UserService {
         Name name = new Name(reqDto.getName());
 
         // 6. 영속 객체의 필드 값 변경 (더티 체킹 발생) -> Transactional 범위가 끝날 때 변경 감지 -> 감지되면 update 쿼리 실행
-        user.updateInfo(reqDto, username, email, nickname, name);
+        user.updateInfo(username, email, nickname, name);
 
         // 7. 반환
         UserUpdateResDto resDto = UserUpdateResDto.builder()
@@ -285,7 +286,7 @@ public class UserService {
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
         // 4. 탈퇴한 사용자인지 검증
-        if (user.getIsActive() == false) {
+        if (user.getIsActive() == IsActive.INACTIVE) {
             throw new UserException(INACTIVE_ACCOUNT);
         }
 

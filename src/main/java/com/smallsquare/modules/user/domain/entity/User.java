@@ -55,7 +55,7 @@ public class User extends BaseTimeEntity {
                 .build();
     }
 
-    public void updateInfo(UserUpdateReqDto reqDto,Username newUsername, Email newEmail, Nickname newNickName, Name newName) {
+    public void updateInfo(Username newUsername, Email newEmail, Nickname newNickName, Name newName) {
         username = newUsername;
         name = newName;
         email = newEmail;
