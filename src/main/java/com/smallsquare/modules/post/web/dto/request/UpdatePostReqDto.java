@@ -10,7 +10,9 @@ import java.util.List;
 @Getter @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreatePostReqDto {
+public class UpdatePostReqDto {
+
+    private Long postId;
 
     private String title;
 

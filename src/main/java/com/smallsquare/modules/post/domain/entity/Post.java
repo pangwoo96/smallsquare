@@ -49,6 +49,14 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
+    /**
+     * Post 빌더 (Dto를 엔티티로 만드는 메소드)
+     * @param title
+     * @param content
+     * @param user
+     * @return
+     */
+
     public static Post of (Title title, Content content, User user) {
         return Post.builder()
                 .title(title)
@@ -61,5 +69,20 @@ public class Post extends BaseTimeEntity {
                 .postStatus(PostStatus.ACTIVE)
                 .build();
     }
+
+    /**
+     * 게시글 작성자가 맞는지 확인
+     * @param userId
+     * @return
+     */
+    public boolean isOwnedBy(Long userId) {
+        return this.user != null && this.user.getId().equals(userId);
+    }
+
+    public void updatePost(Title title, Content content) {
+        this.title = title;
+        this.content = content;
+    }
+
 
 }

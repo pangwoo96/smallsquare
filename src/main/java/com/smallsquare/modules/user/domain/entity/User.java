@@ -38,6 +38,7 @@ public class User extends BaseTimeEntity {
     @Embedded
     private Name name;
 
+    @Enumerated(EnumType.STRING)
     private IsActive isActive;
 
     @Enumerated(EnumType.STRING)

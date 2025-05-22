@@ -1,4 +1,4 @@
-package com.smallsquare.modules.post.web.dto.request;
+package com.smallsquare.modules.post.web.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +10,9 @@ import java.util.List;
 @Getter @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreatePostReqDto {
+public class UpdatePostResDto {
+
+    private Long postId;
 
     private String title;
 
